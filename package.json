@@ -1,0 +1,21 @@
+{
+  "name": "safeagent",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@rhinestone/module-sdk": "^0.2.4",
+    "comlink": "^4.4.2",
+    "dotenv": "^16.4.7",
+    "openai": "^4.84.0",
+    "ox": "^0.6.9",
+    "permissionless": "^0.2.33",
+    "tlsn-js": "^0.1.0-alpha.7.1",
+    "viem": "^2.23.2"
+  }
+}
