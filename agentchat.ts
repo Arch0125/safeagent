@@ -1,7 +1,9 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import readline from "readline";
-import { createTokenLimitSession } from "./modules/tokenLimitSsession";
+import fs from "fs";
+import path from "path";
+import { createTokenLimitSession } from "./modules/tokenLimitSession";
 import { createEthLimitSession } from "./modules/tokenEthLimitSession";
 import { createTimeLimitSession } from "./modules/timeLimitSession";
 
@@ -16,9 +18,31 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-// Simple function to replace multiplication expressions with computed values
-function evaluateArithmeticExpressions(jsonString: string): string {
-    // This regex looks for sequences like "number * number"
+const ALLOWANCES_FILE = path.join(__dirname, "allowances.json");
+
+function loadAllowances() {
+    try {
+        if (fs.existsSync(ALLOWANCES_FILE)) {
+            return JSON.parse(fs.readFileSync(ALLOWANCES_FILE, "utf8"));
+        }
+    } catch (error) {
+        console.error("Error loading allowances:", error);
+    }
+    return { token: {}, time: {}, eth: {} };
+}
+
+function saveAllowances(allowances) {
+    try {
+        fs.writeFileSync(ALLOWANCES_FILE, JSON.stringify(allowances, (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value, null, 2), { encoding: "utf8", flag: "w" });
+    } catch (error) {
+        console.error("Error saving allowances:", error);
+    }
+}
+
+const allowances = loadAllowances();
+
+function evaluateArithmeticExpressions(jsonString) {
     return jsonString.replace(/(\d+)\s*\*\s*(\d+)/g, (match, num1, num2) => {
         return String(Number(num1) * Number(num2));
     });
@@ -82,18 +106,26 @@ always result in an array even if it has one element.`,
         let preParsed = evaluateArithmeticExpressions(content);
         console.log("Processed response:", preParsed);
 
-        let finalData = JSON.parse(preParsed)
-        for(let i = 0; i < finalData.length; i++) {
-            if(finalData[i].token && finalData[i].limit) {
-                await createTokenLimitSession(finalData[i].token, finalData[i].limit);
-            }else if(finalData[i].validAfter == 0 && finalData[i].validUntil) {
-                console.log("Time frame policy:", finalData[i].validUntil);
-                await createTimeLimitSession(finalData[i].validUntil);
-            } else if(finalData[i].limit) {
-                console.log("Value limit policy:", finalData[i]);
-                await createEthLimitSession(finalData[i].limit);
+        let finalData = JSON.parse(preParsed);
+        for (let i = 0; i < finalData.length; i++) {
+            if (finalData[i].token && finalData[i].limit) {
+                console.log("Creating token limit session...");
+                const tokenAllowance = await createTokenLimitSession(finalData[i].token, finalData[i].limit);
+                allowances["token"] = tokenAllowance;
+            } else if (finalData[i].validAfter === 0 && finalData[i].validUntil) {
+                console.log("Creating time frame policy...");
+                const timeAllowance = await createTimeLimitSession(finalData[i].validUntil);
+                allowances["time"] = timeAllowance;
+            } else if (finalData[i].limit) {
+                console.log("Creating value limit policy...");
+                const ethAllowance = await createEthLimitSession(finalData[i].limit);
+                allowances["eth"] = ethAllowance;
             }
         }
+
+        saveAllowances(allowances);
+        console.log("Stored Allowances:", JSON.stringify(allowances, (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value, null, 2));
     } catch (error) {
         console.error("Error:", error);
     } finally {

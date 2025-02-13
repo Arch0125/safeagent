@@ -156,5 +156,5 @@ export async function createTimeLimitSession(validUntil: number) {
             message: { raw: sessionDetails.permissionEnableHash },
         })
 
-    console.log(sessionDetails)
+    return sessionDetails
 }

@@ -158,5 +158,5 @@ export async function createTokenLimitSession(token: string, tokenLimit: number)
             message: { raw: sessionDetails.permissionEnableHash },
         })
 
-    console.log(sessionDetails)
+    return sessionDetails
 }
