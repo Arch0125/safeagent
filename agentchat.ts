@@ -6,6 +6,7 @@ import path from "path";
 import { createTokenLimitSession } from "./modules/tokenLimitSession";
 import { createEthLimitSession } from "./modules/tokenEthLimitSession";
 import { createTimeLimitSession } from "./modules/timeLimitSession";
+import { transferModule } from "./modules/transferModule";
 
 dotenv.config();
 
@@ -35,6 +36,8 @@ function saveAllowances(allowances) {
     try {
         fs.writeFileSync(ALLOWANCES_FILE, JSON.stringify(allowances, (key, value) =>
             typeof value === 'bigint' ? value.toString() : value, null, 2), { encoding: "utf8", flag: "w" });
+
+        console.log("Allowances saved");
     } catch (error) {
         console.error("Error saving allowances:", error);
     }
@@ -89,7 +92,32 @@ If the prompt combines two or more of these methods, return them as an array, fo
     }
 ]
 Ensure that any arithmetic, such as validUntil, is represented as a number in standard arithmetic form.
-always result in an array even if it has one element.`,
+always result in an array even if it has one element. for eg
+[
+    {
+        "validAfter": 0,
+        "validUntil": 60 * 60 * 24
+    }
+]
+You can also decode if the user wants to do a transaction. 
+if its a token transfer, then return the object used in the transfer method, for example:
+[{
+    "method": "transfer",
+    "token": "USDC",
+    "amount": 100,
+    "to": "0x1234...",
+}]
+
+or
+
+[{
+    "method": "transfer",
+    "eth": 100,
+    "to": "0x1234...",
+}]
+
+ALWAYS RESPOND IN ARRAY OF OBJECTS, EVEN IF IT HAS ONE OBJECT.
+`,
         },
         { role: "user", content: prompt },
     ];
@@ -110,22 +138,35 @@ always result in an array even if it has one element.`,
         for (let i = 0; i < finalData.length; i++) {
             if (finalData[i].token && finalData[i].limit) {
                 console.log("Creating token limit session...");
-                const tokenAllowance = await createTokenLimitSession(finalData[i].token, finalData[i].limit);
+                let tokenAllowance = await createTokenLimitSession(finalData[i].token, finalData[i].limit);
                 allowances["token"] = tokenAllowance;
-            } else if (finalData[i].validAfter === 0 && finalData[i].validUntil) {
+                saveAllowances(allowances);
+
+            } else if (finalData[i].validUntil > 0) {
                 console.log("Creating time frame policy...");
-                const timeAllowance = await createTimeLimitSession(finalData[i].validUntil);
+                let timeAllowance = await createTimeLimitSession(finalData[i].validUntil);
                 allowances["time"] = timeAllowance;
+                saveAllowances(allowances);
+
             } else if (finalData[i].limit) {
                 console.log("Creating value limit policy...");
-                const ethAllowance = await createEthLimitSession(finalData[i].limit);
+                let ethAllowance = await createEthLimitSession(finalData[i].limit, "0xa564cB165815937967a7d018B7F34B907B52fcFd");
                 allowances["eth"] = ethAllowance;
+                saveAllowances(allowances);
+
+            } else if (finalData[i].method === "transfer" && finalData[i].eth > 0 && finalData[i].to) {
+                console.log("Transferring eth...", finalData[i].eth, "to", finalData[i].to);
+                let ethAllowance = await createEthLimitSession(finalData[i].eth, finalData[i].to);
+                allowances["eth"] = ethAllowance;
+                saveAllowances(allowances);
+                let res = await transferModule(finalData[i].to, finalData[i].eth);
+                console.log("Transfer:", res);
+            } 
+            else {
+                console.log("Unknown action:", finalData);
             }
         }
 
-        saveAllowances(allowances);
-        console.log("Stored Allowances:", JSON.stringify(allowances, (key, value) =>
-            typeof value === 'bigint' ? value.toString() : value, null, 2));
     } catch (error) {
         console.error("Error:", error);
     } finally {

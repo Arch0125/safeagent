@@ -42,7 +42,7 @@ import {
 } from '@rhinestone/module-sdk'
 import { baseSepolia } from 'viem/chains'
 
-export async function createEthLimitSession(tokenLimit: number) {
+export async function createEthLimitSession(tokenLimit: number, toAddress: string) {
 
     const rpcUrl = "https://base-sepolia.g.alchemy.com/v2/0fxbpb4OCXkkyHhFNPBRelJsFg7XdhML"
     const bundlerUrl = "https://api.pimlico.io/v2/84532/rpc?apikey=pim_PM4crbegoMtx1XehCANf4Q"
@@ -107,11 +107,12 @@ export async function createEthLimitSession(tokenLimit: number) {
     }).extend(erc7579Actions())
 
 
-    const sessionOwner = privateKeyToAccount(generatePrivateKey())
+    const sessionOwner = privateKeyToAccount("0x5b1c32040fad747da544476076de2997bbb06c39353d96a4d72b1db3e60bcc82")
 
+    console.group(tokenLimit)
     const spendingLimitsPolicy = getValueLimitPolicy(
         {
-            limit: BigInt(tokenLimit*1e18),
+            limit: BigInt(tokenLimit),
         },
     )
 
@@ -127,23 +128,21 @@ export async function createEthLimitSession(tokenLimit: number) {
             allowedERC7739Content: [],
             erc1271Policies: [],
         },
-        actions: [
-            {
-                actionTarget: '0xa564cB165815937967a7d018B7F34B907B52fcFd' as Address, // an address as the target of the session execution
-                actionTargetSelector: '0x00000000' as Hex, // function selector to be used in the execution, in this case no function selector is used
-                actionPolicies: [spendingLimitsPolicy],
-            },
-        ],
         chainId: BigInt(baseSepolia.id),
         permitERC4337Paymaster: true,
+        actions: [
+            {
+                actionTarget: toAddress as Address,
+                actionTargetSelector: "0x00000000" as Hex,
+                actionPolicies: [spendingLimitsPolicy],
+              }
+        ]
     }
 
     const account = getAccount({
         address: safeAccount.address,
         type: 'safe',
     })
-
-    const smartSessions = getSmartSessionsValidator({})
 
     const sessionDetails = await getEnableSessionDetails({
         sessions: [session],

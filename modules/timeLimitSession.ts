@@ -108,11 +108,11 @@ export async function createTimeLimitSession(validUntil: number) {
     }).extend(erc7579Actions())
 
 
-    const sessionOwner = privateKeyToAccount(generatePrivateKey())
+    const sessionOwner = privateKeyToAccount("0x5b1c32040fad747da544476076de2997bbb06c39353d96a4d72b1db3e60bcc82")
 
     const spendingLimitsPolicy = getTimeFramePolicy({
         validAfter: 0,
-        validUntil: Date.now() + validUntil,
+        validUntil: Date.now() + validUntil*1000,
     })
 
     const session: Session = {
@@ -128,11 +128,7 @@ export async function createTimeLimitSession(validUntil: number) {
             erc1271Policies: [],
         },
         actions: [
-            {
-                actionTarget: '0xa564cB165815937967a7d018B7F34B907B52fcFd' as Address, // an address as the target of the session execution
-                actionTargetSelector: '0x00000000' as Hex, // function selector to be used in the execution, in this case no function selector is used
-                actionPolicies: [spendingLimitsPolicy],
-            },
+           
         ],
         chainId: BigInt(baseSepolia.id),
         permitERC4337Paymaster: true,
@@ -156,5 +152,6 @@ export async function createTimeLimitSession(validUntil: number) {
             message: { raw: sessionDetails.permissionEnableHash },
         })
 
+        console.log(sessionDetails)
     return sessionDetails
 }

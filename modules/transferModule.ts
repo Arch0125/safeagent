@@ -37,13 +37,12 @@ import {
     getDeadmanSwitch,
     getTrustAttestersAction,
     getDeadmanSwitchValidatorMockSignature,
-    getSpendingLimitsPolicy,
+    isSessionEnabled,
 } from '@rhinestone/module-sdk'
 import { baseSepolia } from 'viem/chains'
+import ALLOWANCES from "../allowances.json"
 
-export async function createTokenLimitSession(token: string, tokenLimit: number) {
-
-    const tokenAddress = token === "USDC" ? "0x036CbD53842c5426634e7929541eC2318f3dCF7e" : "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+export async function transferModule(toAddress:string, amount:number) {
 
     const rpcUrl = "https://base-sepolia.g.alchemy.com/v2/0fxbpb4OCXkkyHhFNPBRelJsFg7XdhML"
     const bundlerUrl = "https://api.pimlico.io/v2/84532/rpc?apikey=pim_PM4crbegoMtx1XehCANf4Q"
@@ -66,6 +65,7 @@ export async function createTokenLimitSession(token: string, tokenLimit: number)
     })
 
     const owner = privateKeyToAccount('0xbc6be7d1a74b23117855c023c9012eda33542c17a948d43e3828d7f42a231b5b')
+    const owner2 = privateKeyToAccount('0x5b1c32040fad747da544476076de2997bbb06c39353d96a4d72b1db3e60bcc82')
 
     const ownableValidator = getOwnableValidator({
         owners: [owner.address],
@@ -108,32 +108,11 @@ export async function createTokenLimitSession(token: string, tokenLimit: number)
     }).extend(erc7579Actions())
 
 
+    console.log(smartAccountClient.account.address)
+
     const sessionOwner = privateKeyToAccount("0x5b1c32040fad747da544476076de2997bbb06c39353d96a4d72b1db3e60bcc82")
 
-    const spendingLimitsPolicy = getSpendingLimitsPolicy([
-        {
-            token: tokenAddress as Address,
-            limit: BigInt(tokenLimit),
-        },
-    ])
-
-    const session: Session = {
-        sessionValidator: OWNABLE_VALIDATOR_ADDRESS,
-        sessionValidatorInitData: encodeValidationData({
-            threshold: 1,
-            owners: [sessionOwner.address],
-        }),
-        salt: toHex(toBytes('0', { size: 32 })),
-        userOpPolicies: [spendingLimitsPolicy],
-        erc7739Policies: {
-            allowedERC7739Content: [],
-            erc1271Policies: [],
-        },
-        actions: [
-        ],
-        chainId: BigInt(baseSepolia.id),
-        permitERC4337Paymaster: true,
-    }
+    const session = ALLOWANCES["eth"]
 
     const account = getAccount({
         address: safeAccount.address,
@@ -142,16 +121,74 @@ export async function createTokenLimitSession(token: string, tokenLimit: number)
 
     const smartSessions = getSmartSessionsValidator({})
 
-    const sessionDetails = await getEnableSessionDetails({
-        sessions: [session],
+    // const sessionDetails = await getEnableSessionDetails({
+    //     sessions: [session],
+    //     account,
+    //     clients: [publicClient],
+    // })
+
+    // sessionDetails.enableSessionData.enableSession.permissionEnableSig =
+    //     await owner.signMessage({
+    //         message: { raw: sessionDetails.permissionEnableHash },
+    //     })
+
+
+    const sessionDetails = ALLOWANCES["eth"]
+
+    const isEnabled = await isSessionEnabled({
+        client: publicClient,
         account,
-        clients: [publicClient],
+        permissionId: '0x1ae8c60d0072f012c2867a4cbe81e829e6d6c09433b0633a38cca966303d0b57',
+      })
+
+    console.log(isEnabled)
+
+    const nonce = await getAccountNonce(publicClient, {
+        address: safeAccount.address,
+        entryPointAddress: entryPoint07Address,
+        key: encodeValidatorNonce({
+            account,
+            validator: smartSessions,
+        }),
     })
 
-    sessionDetails.enableSessionData.enableSession.permissionEnableSig =
-        await owner.signMessage({
-            message: { raw: sessionDetails.permissionEnableHash },
-        })
+    console.log(nonce)
 
-    return sessionDetails
+    sessionDetails.signature = getOwnableValidatorMockSignature({
+        threshold: 1,
+    })
+
+    const userOperation = await smartAccountClient.prepareUserOperation({
+        account: safeAccount,
+        calls: [
+            {
+                to: toAddress,
+                value: BigInt(amount),
+                data: "0x00000000",
+            },
+        ],
+        nonce,
+        signature: encodeSmartSessionSignature(sessionDetails),
+    })
+
+    const userOpHashToSign = getUserOperationHash({
+        chainId: baseSepolia.id,
+        entryPointAddress: entryPoint07Address,
+        entryPointVersion: '0.7',
+        userOperation,
+    })
+
+    sessionDetails.signature = await sessionOwner.signMessage({
+        message: { raw: userOpHashToSign },
+    })
+
+    userOperation.signature = encodeSmartSessionSignature(sessionDetails)
+
+    const userOpHash = await smartAccountClient.sendUserOperation(userOperation)
+
+    const receipt1 = await pimlicoClient.waitForUserOperationReceipt({
+        hash: userOpHash,
+    })
+
+    return receipt1;
 }
