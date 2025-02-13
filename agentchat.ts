@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import dotenv from "dotenv";
 import readline from "readline";
 import { createTokenLimitSession } from "./modules/tokenLimitSsession";
+import { createEthLimitSession } from "./modules/tokenEthLimitSession";
+import { createTimeLimitSession } from "./modules/timeLimitSession";
 
 dotenv.config();
 
@@ -77,7 +79,6 @@ always result in an array even if it has one element.`,
         const content = response.choices[0].message.content;
         console.log("Raw response:", content);
 
-        // Preprocess the content by converting multiplication expressions into numbers
         let preParsed = evaluateArithmeticExpressions(content);
         console.log("Processed response:", preParsed);
 
@@ -85,6 +86,12 @@ always result in an array even if it has one element.`,
         for(let i = 0; i < finalData.length; i++) {
             if(finalData[i].token && finalData[i].limit) {
                 await createTokenLimitSession(finalData[i].token, finalData[i].limit);
+            }else if(finalData[i].validAfter == 0 && finalData[i].validUntil) {
+                console.log("Time frame policy:", finalData[i].validUntil);
+                await createTimeLimitSession(finalData[i].validUntil);
+            } else if(finalData[i].limit) {
+                console.log("Value limit policy:", finalData[i]);
+                await createEthLimitSession(finalData[i].limit);
             }
         }
     } catch (error) {
