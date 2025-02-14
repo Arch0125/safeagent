@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@rhinestone/module-sdk": "^0.2.4",
+    "axios": "^1.7.9",
     "comlink": "^4.4.2",
     "dotenv": "^16.4.7",
     "openai": "^4.84.0",
