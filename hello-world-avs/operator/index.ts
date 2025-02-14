@@ -152,21 +152,82 @@ app.post("/api/generateTask", async (req: express.Request, res: express.Response
 
     console.log("Received prompt:", prompt);
 
+    const messages = [
+        {
+            role: "system",
+            content: `You are a defi ai agent who can only respond in json format based on the action that the user wants to perform.
+You can setup sessions for other agents, which will include, token addresses and their amounts, eth value, time to live, and the action to perform for a specific contract.
+You are supposed to return the object which is used inside these provided methods, for example:
+
+const spendingLimitsPolicy = getSpendingLimitsPolicy([
+    {
+        token: 'USDC',
+        limit: 100,
+    },
+])
+
+or
+
+const timeFramePolicy = getTimeFramePolicy({
+  validAfter: 0, // always valid start
+  validUntil: Date.now() + 60 * 60 * 24, // valid for 24 hours
+})
+
+or
+
+const valueLimitPolicy = getValueLimitPolicy({
+  limit: BigInt(100),
+}) -> this one for the eth value limit
+
+Return strictly the object used inside these methods.
+If the prompt combines two or more of these methods, return them as an array, for example:
+[
+    {
+        "token": "USDC",
+        "limit": 1000
+    },
+    {
+        "validAfter": 0,
+        "validUntil": 60 * 60 * 24
+    }
+]
+Ensure that any arithmetic, such as validUntil, is represented as a number in standard arithmetic form.
+always result in an array even if it has one element. for eg
+[
+    {
+        "validAfter": 0,
+        "validUntil": 60 * 60 * 24
+    }
+]
+You can also decode if the user wants to do a transaction. 
+if its a token transfer, then return the object used in the transfer method, for example:
+[{
+    "method": "transfer",
+    "token": "USDC",
+    "amount": 100,
+    "to": "0x1234...",
+}]
+
+or
+
+[{
+    "method": "transfer",
+    "eth": 100,
+    "to": "0x1234...",
+}]
+
+ALWAYS RESPOND IN ARRAY OF OBJECTS, EVEN IF IT HAS ONE OBJECT.
+`,
+        },
+        { role: "user", content: prompt },
+    ];
+
     // Call OpenAI API.
     const openAiResponse = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
         model: "gpt-3.5-turbo", // Adjust the model as needed.
-        messages: [
-            {
-                role: "developer",
-                content: "You are a helpful assistant."
-            },
-            {
-                role: "user",
-                content: "Write a haiku about recursion in programming."
-            }
-        ]
+        messages: messages,
       },
       {
         headers: {
