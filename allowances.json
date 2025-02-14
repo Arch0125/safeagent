@@ -1,1 +1,93 @@
-{"token":{},"eth":{"permissionEnableHash":"0x611ba083267220ff6005272efca4a296198cfaccabb6c51c0bead5dbdd96c9c3","mode":"0x01","permissionId":"0x1ae8c60d0072f012c2867a4cbe81e829e6d6c09433b0633a38cca966303d0b57","signature":"0x","enableSessionData":{"enableSession":{"chainDigestIndex":0,"hashesAndChainIds":[{"chainId":"84532","sessionDigest":"0x6e13cc58a67e5a548a916a4d279e502f3c681263a4e113dcb01bbe668f4f9350"}],"sessionToEnable":{"sessionValidator":"0x2483DA3A338895199E5e538530213157e931Bf06","sessionValidatorInitData":"0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000028a292f4dc182492f7e23cfda4354bff688f6ea8","salt":"0x3000000000000000000000000000000000000000000000000000000000000000","userOpPolicies":[{"policy":"0x730DA93267E7E513e932301B47F2ac7D062abC83","address":"0x730DA93267E7E513e932301B47F2ac7D062abC83","initData":"0x0000000000000000000000000000000000000000000000000000000000000001"}],"erc7739Policies":{"allowedERC7739Content":[],"erc1271Policies":[]},"chainId":"84532","permitERC4337Paymaster":true,"actions":[{"actionTarget":"0xa564cB165815937967a7d018B7F34B907B52fcFd","actionTargetSelector":"0x00000000","actionPolicies":[{"policy":"0x730DA93267E7E513e932301B47F2ac7D062abC83","address":"0x730DA93267E7E513e932301B47F2ac7D062abC83","initData":"0x0000000000000000000000000000000000000000000000000000000000000001"}]}]},"permissionEnableSig":"0x5b6aaef2db09b876871ce9b4da83c31cab9d250f03f4c8c232342e6b9d35e23f41440ef7a4df54ee259ee6ab685a0460690801dc8f55075d5d21c3a983a1781e1c"},"validator":"0x2483DA3A338895199E5e538530213157e931Bf06","accountType":"safe"}},"time":{"permissionEnableHash":"0x91a916316329fcbd5e5946bc6f4051585052ba0b4c4127d8e5963c80f08b7a6d","mode":"0x01","permissionId":"0x1ae8c60d0072f012c2867a4cbe81e829e6d6c09433b0633a38cca966303d0b57","signature":"0x","enableSessionData":{"enableSession":{"chainDigestIndex":0,"hashesAndChainIds":[{"chainId":"84532","sessionDigest":"0x37dbc9b6cafe493d9c6bd2dfd6832667fd717ef2a0de2ffa8b860835535a93e8"}],"sessionToEnable":{"sessionValidator":"0x2483DA3A338895199E5e538530213157e931Bf06","sessionValidatorInitData":"0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000028a292f4dc182492f7e23cfda4354bff688f6ea8","salt":"0x3000000000000000000000000000000000000000000000000000000000000000","userOpPolicies":[{"policy":"0x8177451511dE0577b911C254E9551D981C26dc72","address":"0x8177451511dE0577b911C254E9551D981C26dc72","initData":"0x0000000000000000000001950107a8cc00000000000000000000000000000000"}],"erc7739Policies":{"allowedERC7739Content":[],"erc1271Policies":[]},"actions":[],"chainId":"84532","permitERC4337Paymaster":true},"permissionEnableSig":"0x07faaa0019c504dddb0ca7da0e536967cadb594f1c5675c868260feadd90ebcb152338f61d50086873af5e7170efb7ea65e88b43971dcc8fc5493e0ed778ca711c"},"validator":"0x2483DA3A338895199E5e538530213157e931Bf06","accountType":"safe"}}}
+{
+  "token": {},
+  "eth": {
+    "permissionEnableHash": "0x14eac6fd6f3fcf5d995b0c82ee948160f4f8e53d956c81c6a54ad5c4e148701b",
+    "mode": "0x01",
+    "permissionId": "0x1ae8c60d0072f012c2867a4cbe81e829e6d6c09433b0633a38cca966303d0b57",
+    "signature": "0x",
+    "enableSessionData": {
+      "enableSession": {
+        "chainDigestIndex": 0,
+        "hashesAndChainIds": [
+          {
+            "chainId": "84532",
+            "sessionDigest": "0x101d114c3f986de81f383c27fcb5f815b9568966060e02314428dd6f46fc145b"
+          }
+        ],
+        "sessionToEnable": {
+          "sessionValidator": "0x2483DA3A338895199E5e538530213157e931Bf06",
+          "sessionValidatorInitData": "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000028a292f4dc182492f7e23cfda4354bff688f6ea8",
+          "salt": "0x3000000000000000000000000000000000000000000000000000000000000000",
+          "userOpPolicies": [
+            {
+              "policy": "0x730DA93267E7E513e932301B47F2ac7D062abC83",
+              "address": "0x730DA93267E7E513e932301B47F2ac7D062abC83",
+              "initData": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          ],
+          "erc7739Policies": {
+            "allowedERC7739Content": [],
+            "erc1271Policies": []
+          },
+          "chainId": "84532",
+          "permitERC4337Paymaster": true,
+          "actions": [
+            {
+              "actionTarget": "0xa564cB165815937967a7d018B7F34B907B52fcFd",
+              "actionTargetSelector": "0x00000000",
+              "actionPolicies": [
+                {
+                  "policy": "0x730DA93267E7E513e932301B47F2ac7D062abC83",
+                  "address": "0x730DA93267E7E513e932301B47F2ac7D062abC83",
+                  "initData": "0x0000000000000000000000000000000000000000000000000000000000000001"
+                }
+              ]
+            }
+          ]
+        },
+        "permissionEnableSig": "0xa867a91a9ea5012e3c3ee2738c1d24fa5c847b03764808a945c01aff4632fd2073982576ed7e835b9657688ca71499bdbe9fb9815e7f709f944f6dcb07838f2b1b"
+      },
+      "validator": "0x2483DA3A338895199E5e538530213157e931Bf06",
+      "accountType": "safe"
+    }
+  },
+  "time": {
+    "permissionEnableHash": "0x91a916316329fcbd5e5946bc6f4051585052ba0b4c4127d8e5963c80f08b7a6d",
+    "mode": "0x01",
+    "permissionId": "0x1ae8c60d0072f012c2867a4cbe81e829e6d6c09433b0633a38cca966303d0b57",
+    "signature": "0x",
+    "enableSessionData": {
+      "enableSession": {
+        "chainDigestIndex": 0,
+        "hashesAndChainIds": [
+          {
+            "chainId": "84532",
+            "sessionDigest": "0x37dbc9b6cafe493d9c6bd2dfd6832667fd717ef2a0de2ffa8b860835535a93e8"
+          }
+        ],
+        "sessionToEnable": {
+          "sessionValidator": "0x2483DA3A338895199E5e538530213157e931Bf06",
+          "sessionValidatorInitData": "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000028a292f4dc182492f7e23cfda4354bff688f6ea8",
+          "salt": "0x3000000000000000000000000000000000000000000000000000000000000000",
+          "userOpPolicies": [
+            {
+              "policy": "0x8177451511dE0577b911C254E9551D981C26dc72",
+              "address": "0x8177451511dE0577b911C254E9551D981C26dc72",
+              "initData": "0x0000000000000000000001950107a8cc00000000000000000000000000000000"
+            }
+          ],
+          "erc7739Policies": {
+            "allowedERC7739Content": [],
+            "erc1271Policies": []
+          },
+          "actions": [],
+          "chainId": "84532",
+          "permitERC4337Paymaster": true
+        },
+        "permissionEnableSig": "0x07faaa0019c504dddb0ca7da0e536967cadb594f1c5675c868260feadd90ebcb152338f61d50086873af5e7170efb7ea65e88b43971dcc8fc5493e0ed778ca711c"
+      },
+      "validator": "0x2483DA3A338895199E5e538530213157e931Bf06",
+      "accountType": "safe"
+    }
+  }
+}

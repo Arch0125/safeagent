@@ -113,22 +113,20 @@ const registerOperator = async () => {
 const app = express();
 app.use(express.json());
 
-// Create a custom HTTPS agent for OpenAI with certificate pinning.
+
 const openAiHttpsAgent = new https.Agent({
-  keepAlive: false, // Force a new connection (and handshake) on each request.
+  keepAlive: false, 
   rejectUnauthorized: true,
   checkServerIdentity: (host, cert) => {
     console.log("Entered checkServerIdentity for host:", host);
-    // Perform default hostname verification.
     const err = tls.checkServerIdentity(host, cert);
     if (err) {
       console.error("Default validation error:", err);
       return err;
     }
-    // Log certificate details.
     console.log("OpenAI Certificate Subject:", cert.subject);
     console.log("OpenAI Certificate Fingerprint:", cert.fingerprint);
-    // Replace with the known fingerprint from OpenAI's certificate.
+
     const expectedFingerprint = "A5:24:53:ED:DD:73:D0:F8:C3:53:F6:DB:77:B1:32:43:9B:D3:78:6E";
     if (cert.fingerprint !== expectedFingerprint) {
       return new Error("OpenAI certificate fingerprint does not match!");
@@ -238,7 +236,6 @@ ALWAYS RESPOND IN ARRAY OF OBJECTS, EVEN IF IT HAS ONE OBJECT.
       }
     );
 
-    // Assume OpenAI response structure: { choices: [ { text: "..." } ], ... }
     const openAiText = openAiResponse.data.choices[0].message.content.trim();
     console.log("OpenAI response:", openAiText);
 
